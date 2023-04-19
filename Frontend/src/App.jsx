@@ -1,3 +1,4 @@
+import { Box } from "@chakra-ui/react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Footer from "./layout/Footer";
@@ -12,8 +13,9 @@ import SignUp from "./pages/SignUp";
 function App() {
   return (
     <>
-      <Router>
+      <Router scrollRestoration="auto">
         <Header />
+        <Box pt={14} mb={30}  ml={[4,"auto","17rem"]} >
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
@@ -22,6 +24,7 @@ function App() {
           <Route path="/signIn" element={<SignIn />} />
           <Route path="/new" element={<SetNewBlog />} />
         </Routes>
+        </Box>
         <Footer />
       </Router>
     </>

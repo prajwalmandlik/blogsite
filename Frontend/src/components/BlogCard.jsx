@@ -11,7 +11,7 @@ import {
 
  const BlogCard = ({img , title, desc}) => {
   return (
-    <Center py={6}>
+    <Center py={1}>
       <Box
         maxW={'445px'}
         w={'full'}
@@ -21,7 +21,7 @@ import {
         p={6}
         overflow={'hidden'}>
         <Box
-          h={'150px'}
+          h={'170px'}
           bg={'gray.100'}
           mt={-6}
           mx={-6}

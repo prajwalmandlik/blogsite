@@ -1,15 +1,14 @@
-import { SimpleGrid } from '@chakra-ui/react'
+import { Box, Img, SimpleGrid } from '@chakra-ui/react'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import BlogCard from '../components/BlogCard'
-import Filter from '../components/Filter'
 import { BlogData } from '../Data'
 
 const Home = () => {
   return (
     <>
-      <Filter />
-      <SimpleGrid columns={[1,1,2,2,3]} maxW={"1080px"} m={[2,2,2,"auto", "auto"]} gap={5} >
+      <Img />
+      <SimpleGrid columns={[1,1,1,2,3]} mt={6}  marginRight={[4, "auto",5]} gap={5} >
         {BlogData.map((element,index) => {
           return (
             <>
