@@ -8,7 +8,7 @@ const Home = () => {
   return (
     <>
       <Img />
-      <SimpleGrid columns={[1,1,1,2,3]} mt={6}  marginRight={[4, "auto",5]} gap={5} >
+      <SimpleGrid columns={1} mt={6}  marginRight={[4, "auto",5]} gap={5} >
         {BlogData.map((element,index) => {
           return (
             <>

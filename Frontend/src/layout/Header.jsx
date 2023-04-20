@@ -13,8 +13,14 @@ import {
   Text,
   useDisclosure,
   Icon,
+  Button,
+  Menu,
+  MenuButton,
+  HStack,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FaClipboardCheck, FaRss } from "react-icons/fa";
 import { MdHome } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
@@ -22,6 +28,7 @@ import { Link, useLocation } from "react-router-dom";
 const Header = () => {
   const sidebar = useDisclosure();
   const { pathname } = useLocation();
+  const [ login , setLogin ] = useState(true);
 
   useEffect(() => {
     window.scrollTo({
@@ -31,21 +38,17 @@ const Header = () => {
   }, [pathname]);
 
   const NavItem = (props) => {
-    const { icon, children, ...rest } = props;
+    const { icon, selected , children, ...rest } = props;
     return (
-      <Flex
-        align="center"
+      <Button
         px="4"
         mx="2"
         rounded="md"
         py="3"
         cursor="pointer"
+        bg="inherit"
         color="whiteAlpha.900"
         _hover={{
-          bg: "whiteAlpha.900",
-          color: "blackAlpha.900",
-        }}
-        _focus={{
           bg: "whiteAlpha.900",
           color: "blackAlpha.900",
         }}
@@ -65,7 +68,7 @@ const Header = () => {
           />
         )}
         {children}
-      </Flex>
+      </Button>
     );
   };
 
@@ -88,14 +91,16 @@ const Header = () => {
     >
       <Flex px="4" py="5" align="center">
         {/* <Logo /> */}
+        <Link to="/">
         <Text
           fontSize="2xl"
           ml="2"
           color="whiteAlpha.900"
           fontWeight="semibold"
         >
-          Bloger
+          Blogger
         </Text>
+        </Link>
       </Flex>
       <Flex
         direction="column"
@@ -103,13 +108,16 @@ const Header = () => {
         fontSize="sm"
         color="gray.600"
         aria-label="Main Navigation"
+        gap="2"
       >
-        <Link to="/"><NavItem icon={MdHome}>Home</NavItem></Link>
-        <Link to="/profile"><NavItem >Profile</NavItem></Link>
-        <Link to="/new"><NavItem >New Blog</NavItem></Link>
-        <Link to="/blog/1"><NavItem >Blog</NavItem></Link>
-        <Link to="/signIn"><NavItem >Sign In</NavItem></Link>
-        <Link to="/signUp"><NavItem >Sign Up</NavItem></Link>
+        <NavItem>All</NavItem>
+        <NavItem>Web</NavItem>
+        <NavItem>App</NavItem>
+        <NavItem>C++</NavItem>
+        <NavItem>JavaScript</NavItem>
+        <NavItem>Python</NavItem>
+        <NavItem>AI</NavItem>
+        <NavItem>Other</NavItem>
       </Flex>
     </Box>
   );
@@ -169,9 +177,10 @@ const Header = () => {
             onClick={sidebar.onOpen}
             icon={<HamburgerIcon />}
             size="md"
-            _focus={{ bg: "inherit" }}
-            _active={{ bg: "inherit" }}
-            _hover={{ bg: "inherit" }}
+            _focus={{ bg: "white" }}
+            _active={{ bg: "white" }}
+            _hover={{ bg: "white" }}
+            bg="white"
           />
           <InputGroup
             maxW={96}
@@ -186,13 +195,45 @@ const Header = () => {
             <Input placeholder="Search for articles..." />
           </InputGroup>
 
-          <Flex align="center" gap={2}>
-            <Avatar ml="4" size="sm" name="prajwal Mandlik" cursor="pointer" />
-            <Text fontWeight={"700"}>PRAJWAL</Text>
-          </Flex>
+          <Box>
+                {login ? (
+                  <User name={"Prajwal Mandlik"} logOut={""} />
+                ) : (
+                  <>
+                    <Link to={`/signIn`}>
+                      <Button variant="outline" colorScheme="blue">
+                        Sign In
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </Box>
         </Flex>
       </Box>
     </Box>
+  );
+};
+
+const User = ({ name, logOut }) => {
+  const firstName = name.split(" ")[0];
+
+  return (
+    <>
+      <Menu>
+        <MenuButton>
+          <HStack>
+            <Avatar size="sm" name={name} />
+            <Text>{firstName.toUpperCase()}</Text>
+          </HStack>
+        </MenuButton>
+        <MenuList  minW={"120px"}>
+          <Link to={`/profile`}>
+            <MenuItem>Profile</MenuItem>
+          </Link>
+          <MenuItem onClick={logOut}>Log out</MenuItem>
+        </MenuList>
+      </Menu>
+    </>
   );
 };
 
