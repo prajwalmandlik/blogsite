@@ -32,19 +32,48 @@ export const register = async (req, res,next) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    user = await User.create({ name, email, password: hashedPassword });
+    user = await User.create({ ...req.body , password: hashedPassword });
 
     sendCookie(user, res, "Registered Successfully", 201);
+    
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) return next(new ErrorHandler("User not found", 404));
+
+    //code to update 
+    await user.updateOne({
+      $set: {
+        ...req.body,
+      }
+    })
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "User Updated!",
+    });
   } catch (error) {
     next(error);
   }
 };
 
 export const getMyProfile = (req, res) => {
+
+  // console.log(req.user);
+
   res.status(200).json({
     success: true,
     user: req.user,
   });
+
 };
 
 export const logout = (req, res) => {

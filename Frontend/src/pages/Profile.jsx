@@ -11,20 +11,29 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useContext } from "react";
+import { Link, Navigate } from "react-router-dom";
 import BlogCard from "../components/BlogCard";
 import { BlogData } from "../Data";
+import { Context } from "../main";
 
 const Profile = () => {
+
+  const { user , isAuthenticated} = useContext(Context);
+
+if(!isAuthenticated){
+  return <Navigate to={`/`} />
+}
+
   return (
     <>
       <Container centerContent py={10}>
-        <Avatar name="Prajwal Mandlik" size={"2xl"} />
+        <Avatar name={user.name} size={"2xl"} />
         <Heading as="h2" size="lg" p={5}>
-          Prajwal Mandlik
+          {user.name}
         </Heading>
-        <Button>Writer new blog</Button>
+        <Link to={`/new`} >
+        <Button>Writer new blog</Button></Link>
       </Container>
 
       <Divider />
@@ -34,18 +43,28 @@ const Profile = () => {
         </Heading>
       </Center>
 
-      <SimpleGrid columns={1} mt={6} marginRight={[4, "auto", 5]} gap={5}>
+      <SimpleGrid
+        columns={1}
+        mt={6}
+        mx={{
+          base: 4,
+          md: 8,
+          lg: "auto 5",
+        }}
+        // marginRight={["auto", "auto", 5]}
+        gap={5}
+      >
         {BlogData.map((element, index) => {
           return (
             <>
               {/* <Link to={`/blog/${1}`}> */}
-                <BlogCard
-                  key={index}
-                  img={element.image}
-                  title={element.title}
-                  desc={element.description}
-                  editor={true}
-                />
+              <BlogCard
+                key={index}
+                img={element.image}
+                title={element.title}
+                desc={element.description}
+                editor={true}
+              />
               {/* </Link> */}
             </>
           );

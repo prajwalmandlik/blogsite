@@ -3,19 +3,14 @@ import { Blog } from "../models/blog.js";
 
 export const newBlog = async (req, res, next) => {
   try {
-    const { title, blog, flare, category, author } = req.body;
 
     await Blog.create({
-      title,
-      blog,
-      flare,
-      category,
-      author
+      ...req.body,
     });
 
     res.status(201).json({
       success: true,
-      message: "scheme added Successfully",
+      message: "blog added Successfully",
     });
   } catch (error) {
     next(error);
@@ -24,11 +19,11 @@ export const newBlog = async (req, res, next) => {
 
 export const getAllBlog = async (req, res, next) => {
   try {
-    const Blog = await Blog.find().select("_id title description flare link");
+    const blog = await Blog.find();
 
     res.status(200).json({
       success: true,
-      Blog,
+      blog,
     });
   } catch (error) {
     next(error);
@@ -37,7 +32,24 @@ export const getAllBlog = async (req, res, next) => {
 
 export const getBlogById = async (req, res, next) => {
   try {
-    const blog = await Blog.findById(req.params.id);
+    const blog = await Blog.find(req.params.id);
+
+    if (!blog) return next(new ErrorHandler("blog not found", 404));
+
+    res.status(200).json({
+      success: true,
+      blog,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getBlogByUserId = async (req, res, next) => {
+  try {
+    const  authorId  = req.params.key;
+
+    const blog = await Blog.find({ 'author.authorId': authorId })
 
     if (!blog) return next(new ErrorHandler("blog not found", 404));
 
@@ -96,23 +108,18 @@ export const getBlogByFilter = async (req, res, next) => {
 
 export const updateBlog = async (req, res, next) => {
   try {
-    const blog = await Blog.findById(req.params.id);
+    const blogs = await Blog.findById(req.params.id);
 
-    if (!blog) return next(new ErrorHandler("Blog not found", 404));
+    if (!blogs) return next(new ErrorHandler("Blog not found", 404));
 
-    const { title, description, department, category, eligibility, benefits, requiredDocuments, steps, flare, link, img, note } = req.body;
     //code to update 
-    await blog.updateOne({
+    await blogs.updateOne({
       $set: {
-        title,
-        blog,
-        flare,
-        category,
-        author
+        ...req.body,
       }
     })
 
-    await blog.save();
+    await blogs.save();
 
     res.status(200).json({
       success: true,

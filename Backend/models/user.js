@@ -15,10 +15,11 @@ const schema = new mongoose.Schema({
     type: String,
     select: false,
   },
+  profileImage: String,
   createdAt: {
     type: Date,
     default: Date.now,
   },
-}); 
+});
 
 export const User = mongoose.model("User", schema);

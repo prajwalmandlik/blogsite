@@ -20,15 +20,30 @@ import {
   MenuList,
   MenuItem,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import axios from "axios";
+import React, { useContext, useEffect, useState } from "react";
 import { FaClipboardCheck, FaRss } from "react-icons/fa";
 import { MdHome } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
+import { Context, server } from "../main";
 
 const Header = () => {
   const sidebar = useDisclosure();
   const { pathname } = useLocation();
-  const [ login , setLogin ] = useState(true);
+  const { isAuthenticated ,setIsAuthenticated, user, setUser } = useContext(Context);
+
+  const logOut = async () => {
+    try {
+      await axios.get(`${server}/user/logout`, {
+        withCredentials: true,
+      });
+      const data = { email: "" }
+      setIsAuthenticated(false);
+      setUser(data);
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo({
@@ -196,8 +211,8 @@ const Header = () => {
           </InputGroup>
 
           <Box>
-                {login ? (
-                  <User name={"Prajwal Mandlik"} logOut={""} />
+                {isAuthenticated ? (
+                  <User name={user && user.name} logOut={logOut} />
                 ) : (
                   <>
                     <Link to={`/signIn`}>
@@ -214,7 +229,7 @@ const Header = () => {
   );
 };
 
-const User = ({ name, logOut }) => {
+const User = ({ name="user name", logOut }) => {
   const firstName = name.split(" ")[0];
 
   return (

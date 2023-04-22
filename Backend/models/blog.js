@@ -8,26 +8,33 @@ const schema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  description: {
+    type: String,
+    required: true,
+  },
   blog: {
     type: String,
     required: true,
   },
   flare: {
     type: String,
-    required: true,
+    // required: true,
   },
-  category:{
+  category: {
     type: String,
     required: true,
   },
-  author:{
+  author: {
+    authorId: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       required: true,
     },
-    profileImg:{
+    profileImg: {
       type: String,
-      required: true,
     }
   },
   createdAt: {
