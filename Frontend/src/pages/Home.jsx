@@ -1,12 +1,30 @@
 import { Box, Img, SimpleGrid } from "@chakra-ui/react";
-import React from "react";
+import axios from "axios";
+import React, { useContext, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 import BlogCard from "../components/BlogCard";
-import { BlogData } from "../Data";
+import { BlogData as Data } from "../Data";
+import { Context, server } from "../main";
 
 
 const Home = () => {
+  const [blogData, setBlogData] = useState([]);
+  const { user, isAuthenticated } = useContext(Context);
 
+  useEffect(() => {
+    axios
+      .get(`${server}/blog/getAll`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        const data = res.data.blogs;
+        setBlogData(data);
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message);
+      });
+  }, []);
 
   return (
     <>
@@ -21,15 +39,13 @@ const Home = () => {
         }}
         gap={5}
       >
-        {BlogData.map((element, index) => {
+        {blogData.map((element, index) => {
           return (
             <>
-              <Link to={`/blog/${1}`}>
+              <Link to={`/blog/${element._id}`}>
                 <BlogCard
                   key={index}
-                  img={element.image}
-                  title={element.title}
-                  desc={element.description}
+                  blogData={element}
                 />
               </Link>
             </>

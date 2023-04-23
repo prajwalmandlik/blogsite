@@ -6,24 +6,38 @@ import {
   Container,
   Divider,
   Heading,
-  HStack,
   SimpleGrid,
-  Text,
-  VStack,
 } from "@chakra-ui/react";
-import React, { useContext } from "react";
+import axios from "axios";
+import React, { useContext, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import { Link, Navigate } from "react-router-dom";
 import BlogCard from "../components/BlogCard";
-import { BlogData } from "../Data";
-import { Context } from "../main";
+import { BlogData as Data } from "../Data";
+import { Context, server } from "../main";
 
 const Profile = () => {
+  const { user, isAuthenticated } = useContext(Context);
+  const [blogData, setBlogData] = useState([]);
 
-  const { user , isAuthenticated} = useContext(Context);
+  useEffect(() => {
+    axios
+      .get(`${server}/blog/getByUserId/${user._id}`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        const data = res.data.blogs;
+        setBlogData(data);
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message);
+      });
+  }, []);
 
-if(!isAuthenticated){
-  return <Navigate to={`/`} />
-}
+  if (!isAuthenticated) {
+    return <Navigate to={`/`} />;
+  }
+
 
   return (
     <>
@@ -32,8 +46,9 @@ if(!isAuthenticated){
         <Heading as="h2" size="lg" p={5}>
           {user.name}
         </Heading>
-        <Link to={`/new`} >
-        <Button>Writer new blog</Button></Link>
+        <Link to={`/writeBlog/${0}`}>
+          <Button>Writer new blog</Button>
+        </Link>
       </Container>
 
       <Divider />
@@ -53,21 +68,16 @@ if(!isAuthenticated){
         }}
         // marginRight={["auto", "auto", 5]}
         gap={5}
+        minH={"50vh"}
       >
-        {BlogData.map((element, index) => {
+        {blogData.map((e, i) => {
           return (
-            <>
-              {/* <Link to={`/blog/${1}`}> */}
-              <BlogCard
-                key={index}
-                img={element.image}
-                title={element.title}
-                desc={element.description}
+            <BlogCard
+                key={i}
+                blogData={e}
                 editor={true}
               />
-              {/* </Link> */}
-            </>
-          );
+          )
         })}
       </SimpleGrid>
     </>

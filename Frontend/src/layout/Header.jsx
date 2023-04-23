@@ -229,9 +229,8 @@ const Header = () => {
   );
 };
 
-const User = ({ name="user name", logOut }) => {
+const User = ({ name="user" , logOut }) => {
   const firstName = name.split(" ")[0];
-
   return (
     <>
       <Menu>

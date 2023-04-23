@@ -46,7 +46,7 @@ function App() {
             <Route path="/blog/:id" element={<BlogPage />} />
             <Route path="/signUp" element={<SignUp />} />
             <Route path="/signIn" element={<SignIn />} />
-            <Route path="/new" element={<SetNewBlog />} />
+            <Route path="/writeBlog/:id" element={<SetNewBlog />} />
           </Routes>
         </Box>
         <Footer />

@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -18,15 +18,31 @@ import { v4 } from "uuid";
 import { storage } from "../firebase/Firebase";
 import { Context, server } from "../main";
 import imageCompression from "browser-image-compression";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 const SetNewBlog = () => {
-  const [flare, setFlare] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [blog, setBlog] = useState("");
+  const { id } = useParams();
+  const navigate = useNavigate();
   const { loading, setLoading, isAuthenticated, user } = useContext(Context);
+  const [blogData, setBlogData] = useState({
+    flare: "",
+    title: "",
+    description: "",
+    category: "",
+    blog: "",
+    author: {
+      authorId: user._id,
+      name: user.name,
+      profileImg: user.profileImg,
+    },
+  });
+
+  let name, value;
+  const updateData = (e) => {
+    name = e.target.name;
+    value = e.target.value;
+    setBlogData({ ...blogData, [name]: value });
+  };
 
   const modules = {
     toolbar: [
@@ -46,7 +62,7 @@ const SetNewBlog = () => {
   };
 
   const categoryOption = [
-    "Wev Development",
+    "Web Development",
     "App Development",
     "C++",
     "JavaScript",
@@ -70,7 +86,7 @@ const SetNewBlog = () => {
       uploadBytes(imageRef, compressedFile).then(() => {
         toast.success("image Upload");
         getDownloadURL(imageRef).then((url) => {
-          setFlare(url);
+          setBlogData({ ...blogData, flare: url });
         });
       });
     } catch (error) {
@@ -78,38 +94,62 @@ const SetNewBlog = () => {
     }
   };
 
+  useEffect(() => {
+    if (id !== "0") {
+      try {
+        axios
+          .get(`${server}/blog/${id}`, {
+            withCredentials: true,
+          })
+          .then((res) => {
+            const blog = res.data.blog;
+            setBlogData(blog);
+            console.log({...blog});
+            console.log(blogData);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     setLoading(true);
     e.preventDefault();
 
-    const author = {
-      authorId: user._id,
-      name: user.name,
-      profileImg: user.profileImg,
-    };
-
-    const blogData = {
-      flare,
-      title,
-      blog,
-      description,
-      category,
-      author,
-    };
-
     try {
-      const data = await axios.post(
-        `${server}/blog/new`,
-        { ...blogData },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-      toast.success(data.data.message);
-      setLoading(false);
+      if (id === "0") {
+        const data = await axios.post(
+          `${server}/blog/new`,
+          { ...blogData },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+        toast.success(data.data.message);
+        setLoading(false);
+        navigate("/profile");
+      } else {
+        const data = await axios.put(
+          `${server}/blog/${id}`,
+          { ...blogData },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+        toast.success(data.data.message);
+        setLoading(false);
+        navigate("/profile");
+      }
     } catch (error) {
       toast.error(error.response.data.message);
       setLoading(false);
@@ -122,7 +162,7 @@ const SetNewBlog = () => {
 
   return (
     <>
-      <Box m={10} ml={0} minH={"100vh"}>
+      <Box m={10} mx={{base: 4, md: 0}} minH={"100vh"}>
         <form onSubmit={handleSubmit}>
           <FormControl py={4}>
             <FormLabel>Flare</FormLabel>
@@ -133,11 +173,11 @@ const SetNewBlog = () => {
               onChange={uploadImage}
             />
             <Box py={4}>
-              {flare && (
+              {blogData.flare && (
                 <Img
-                  src={flare}
+                  src={blogData.flare}
                   alt="blog img"
-                  fit={"cover"}
+                  fill={"cover"}
                   rounded={"md"}
                   align={"center"}
                   w={"100%"}
@@ -152,8 +192,9 @@ const SetNewBlog = () => {
             <Input
               type="text"
               border={"1px black solid"}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={blogData.title}
+              onChange={updateData}
+              name="title"
               placeholder="write title"
             />
           </FormControl>
@@ -162,9 +203,10 @@ const SetNewBlog = () => {
             <FormLabel>Description</FormLabel>
             <Textarea
               border="1px black solid"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="descripe your blog"
+              value={blogData.description}
+              name="description"
+              onChange={updateData}
+              placeholder="describe your blog"
             />
           </FormControl>
 
@@ -172,7 +214,8 @@ const SetNewBlog = () => {
             <FormLabel>Category</FormLabel>
             <Select
               placeholder="Select category"
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={updateData}
+              name="category"
               border={"1px black solid"}
             >
               {categoryOption.map((option) => {
@@ -191,8 +234,10 @@ const SetNewBlog = () => {
               theme="snow"
               className={"text-editor"}
               modules={modules}
-              value={blog}
-              onChange={setBlog}
+              value={blogData.blog}
+              onChange={(value) => {
+                setBlogData({ ...blogData, blog: value });
+              }}
             />
           </FormControl>
 
