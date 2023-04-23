@@ -17,7 +17,7 @@ import "react-quill/dist/quill.snow.css";
 import { v4 } from "uuid";
 import { storage } from "../firebase/Firebase";
 import { Context, server } from "../main";
-import imageCompression from 'browser-image-compression'
+import imageCompression from "browser-image-compression";
 import { Navigate } from "react-router-dom";
 
 const SetNewBlog = () => {
@@ -26,7 +26,7 @@ const SetNewBlog = () => {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [blog, setBlog] = useState("");
-  const { loading, setLoading, isAuthenticated , user } = useContext(Context);
+  const { loading, setLoading, isAuthenticated, user } = useContext(Context);
 
   const modules = {
     toolbar: [
@@ -88,17 +88,19 @@ const SetNewBlog = () => {
       profileImg: user.profileImg,
     };
 
+    const blogData = {
+      flare,
+      title,
+      blog,
+      description,
+      category,
+      author,
+    };
+
     try {
       const data = await axios.post(
         `${server}/blog/new`,
-        {
-          flare,
-          title,
-          blog,
-          description,
-          category,
-          author,
-        },
+        { ...blogData },
         {
           headers: {
             "Content-Type": "application/json",
