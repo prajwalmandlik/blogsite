@@ -28,7 +28,6 @@ const Home = () => {
 
   return (
     <>
-      <Img />
       <SimpleGrid
         columns={1}
         mt={6}
@@ -38,6 +37,7 @@ const Home = () => {
           sm: "auto",
         }}
         gap={5}
+        minH="100vh"
       >
         {blogData.map((element, index) => {
           return (
