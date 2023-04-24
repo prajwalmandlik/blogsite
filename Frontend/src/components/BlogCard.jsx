@@ -12,13 +12,12 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import axios from "axios";
+import moment from "moment/moment";
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { server } from "../main";
 
 const BlogCard = ({ blogData, editor = false }) => {
-
-
   const deleteScheme = () => {
     const conf = confirm("delete blog");
 
@@ -42,7 +41,9 @@ const BlogCard = ({ blogData, editor = false }) => {
     }
   };
 
-
+  const date = blogData.createdAt.split("T")[0];
+  
+  
   return (
     <SimpleGrid
       columns={[1, 1, 2]}
@@ -142,7 +143,11 @@ const BlogCard = ({ blogData, editor = false }) => {
                 <Button>Read More</Button>
               </Link>
               <Link to={`/writeBlog/${blogData._id}`}>
-              <Button ml={4}>Edit</Button></Link> <Button ml={4} onClick={deleteScheme}>Delete</Button>
+                <Button ml={4}>Edit</Button>
+              </Link>{" "}
+              <Button ml={4} onClick={deleteScheme}>
+                Delete
+              </Button>
             </HStack>
           </>
         ) : (
@@ -154,7 +159,7 @@ const BlogCard = ({ blogData, editor = false }) => {
               />
               <Stack direction={"column"} spacing={0} fontSize={"sm"}>
                 <Text fontWeight={600}>{blogData.author.name}</Text>
-                <Text color={"gray.500"}>Feb 08, 2021</Text>
+                <Text color={"gray.500"}>{moment(date).fromNow()}</Text>
               </Stack>
             </Stack>
           </>

@@ -1,4 +1,4 @@
-import { HamburgerIcon, SearchIcon } from "@chakra-ui/icons";
+import { CloseIcon, HamburgerIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
@@ -19,25 +19,37 @@ import {
   HStack,
   MenuList,
   MenuItem,
+  InputRightElement,
 } from "@chakra-ui/react";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { FaClipboardCheck, FaRss } from "react-icons/fa";
 import { MdHome } from "react-icons/md";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Context, server } from "../main";
 
 const Header = () => {
   const sidebar = useDisclosure();
   const { pathname } = useLocation();
-  const { isAuthenticated ,setIsAuthenticated, user, setUser } = useContext(Context);
+  const {
+    isAuthenticated,
+    setIsAuthenticated,
+    user,
+    setUser,
+    filter,
+    setFilter,
+    search,
+    setSearch,
+  } = useContext(Context);
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
 
   const logOut = async () => {
     try {
       await axios.get(`${server}/user/logout`, {
         withCredentials: true,
       });
-      const data = { email: "" }
+      const data = { email: "" };
       setIsAuthenticated(false);
       setUser(data);
     } catch (error) {
@@ -45,15 +57,21 @@ const Header = () => {
     }
   };
 
+  const applaySearch = (e) => {
+    e.preventDefault();
+    setSearch(searchValue);
+    navigate("/");
+  };
+
   useEffect(() => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth',
+      behavior: "smooth",
     });
   }, [pathname]);
 
   const NavItem = (props) => {
-    const { icon, selected , children, ...rest } = props;
+    const { icon, selected, children, ...rest } = props;
     return (
       <Button
         px="4"
@@ -61,8 +79,12 @@ const Header = () => {
         rounded="md"
         py="3"
         cursor="pointer"
-        bg="inherit"
-        color="whiteAlpha.900"
+        bg={filter === children.toLowerCase() ? "whiteAlpha.900" : "inherit"}
+        color={
+          filter === children.toLowerCase()
+            ? "blackAlpha.900"
+            : "whiteAlpha.900"
+        }
         _hover={{
           bg: "whiteAlpha.900",
           color: "blackAlpha.900",
@@ -71,6 +93,10 @@ const Header = () => {
         fontWeight="semibold"
         transition=".15s ease"
         {...rest}
+        onClick={() => {
+          setFilter(children.toLowerCase());
+          navigate("/");
+        }}
       >
         {icon && (
           <Icon
@@ -107,14 +133,14 @@ const Header = () => {
       <Flex px="4" py="5" align="center">
         {/* <Logo /> */}
         <Link to="/">
-        <Text
-          fontSize="2xl"
-          ml="2"
-          color="whiteAlpha.900"
-          fontWeight="semibold"
-        >
-          Blogger
-        </Text>
+          <Text
+            fontSize="2xl"
+            ml="2"
+            color="whiteAlpha.900"
+            fontWeight="semibold"
+          >
+            Blogger
+          </Text>
         </Link>
       </Flex>
       <Flex
@@ -197,39 +223,67 @@ const Header = () => {
             _hover={{ bg: "white" }}
             bg="white"
           />
-          <InputGroup
-            maxW={96}
-            display={{
-              base: "flex",
-              md: "flex",
-            }}
-          >
-            <InputLeftElement color="gray.500">
-              <SearchIcon />
-            </InputLeftElement>
-            <Input placeholder="Search for articles..." />
-          </InputGroup>
-
           <Box>
-                {isAuthenticated ? (
-                  <User name={user && user.name} logOut={logOut} />
-                ) : (
-                  <>
-                    <Link to={`/signIn`}>
-                      <Button variant="outline" colorScheme="blue">
-                        Sign In
-                      </Button>
-                    </Link>
-                  </>
-                )}
-              </Box>
+            <form onSubmit={applaySearch}>
+              <HStack gap={0}>
+                <InputGroup>
+                  <Input
+                    type="text"
+                    placeholder="Search"
+                    value={searchValue}
+                    onChange={(e) => {
+                      setSearchValue(e.target.value);
+                    }}
+                    w={["100%", "100%", "100%", "30rem"]}
+                  />
+                  <InputRightElement h={"full"}>
+                    <Button
+                      variant={"ghost"}
+                      onClick={() => {
+                        setSearchValue("");
+                      }}
+                      _focus={{ bg: "inherit" }}
+                      _active={{ bg: "inherit" }}
+                      _hover={{ bg: "inherit" }}
+                      hidden={searchValue === "" ? true : false}
+                    >
+                      <CloseIcon fontSize={".8rem"} />
+                    </Button>
+                  </InputRightElement>
+                </InputGroup>
+                <IconButton
+                  type={"submit"}
+                  bg={"inherit"}
+                  _focus={{ bg: "inherit" }}
+                  _active={{ bg: "inherit" }}
+                  _hover={{ bg: "inherit" }}
+                  px={[0, 0, "1rem"]}
+                >
+                  <SearchIcon />
+                </IconButton>
+              </HStack>
+            </form>
+          </Box>
+          <Box>
+            {isAuthenticated ? (
+              <User name={user && user.name} logOut={logOut} />
+            ) : (
+              <>
+                <Link to={`/signIn`}>
+                  <Button variant="outline" colorScheme="blue">
+                    Sign In
+                  </Button>
+                </Link>
+              </>
+            )}
+          </Box>
         </Flex>
       </Box>
     </Box>
   );
 };
 
-const User = ({ name="user" , logOut }) => {
+const User = ({ name = "user", logOut }) => {
   const firstName = name.split(" ")[0];
   return (
     <>
@@ -240,7 +294,7 @@ const User = ({ name="user" , logOut }) => {
             <Text>{firstName.toUpperCase()}</Text>
           </HStack>
         </MenuButton>
-        <MenuList  minW={"120px"}>
+        <MenuList minW={"120px"}>
           <Link to={`/profile`}>
             <MenuItem>Profile</MenuItem>
           </Link>
