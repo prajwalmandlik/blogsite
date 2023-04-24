@@ -18,7 +18,7 @@ const schema = new mongoose.Schema({
   },
   flare: {
     type: String,
-    // required: true,
+    required: true,
   },
   category: {
     type: String,

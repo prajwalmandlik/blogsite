@@ -25,7 +25,7 @@ import { server } from "../main";
 
 export default function BlogPage() {
   const { id } = useParams();
-  const [blogData, setBlogData] = useState([]);
+  const [blogData, setBlogData] = useState("");
 
   useEffect(() => {
     try {
@@ -35,7 +35,7 @@ export default function BlogPage() {
         })
         .then((res) => {
           const blog = res.data.blog;
-          setBlogData(blog);
+          setBlogData(...blog);
         })
         .catch((error) => {
           console.log(error);
@@ -44,9 +44,40 @@ export default function BlogPage() {
       console.log(error.message);
     }
   }, []);
-  return (
+  
+return (
     <>
-      <h1>{blogData.title}</h1>
+      <Container maxW={'7xl'}>
+      <SimpleGrid
+       columns={1}
+        py={4}>
+        <Flex>
+          <Image
+            rounded={'md'}
+            alt={'product image'}
+            src={blogData.flare}
+            fit={'cover'}
+            align={'center'}
+            w={'100%'}
+            h={{ base: '100%', sm: '400px', lg: '500px' }}
+          />
+        </Flex>
+        <Stack spacing={{ base: 6, md: 10 }}>
+          <Box as={'header'}>
+            <Heading
+              lineHeight={1.1}
+              fontWeight={600}
+              fontSize={{ base: '2xl', sm: '3xl', lg: '4xl' }}>
+              {blogData.title}
+            </Heading>
+          </Box>
+
+          <Box>
+            <Text dangerouslySetInnerHTML={{__html: blogData.blog}} ></Text>
+          </Box>
+        </Stack>
+      </SimpleGrid>
+    </Container>
     </>
   );
 }

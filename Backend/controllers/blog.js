@@ -19,11 +19,11 @@ export const newBlog = async (req, res, next) => {
 
 export const getAllBlog = async (req, res, next) => {
   try {
-    const blog = await Blog.find();
+    const blogs = await Blog.find();
 
     res.status(200).json({
       success: true,
-      blog,
+      blogs,
     });
   } catch (error) {
     next(error);
@@ -32,7 +32,7 @@ export const getAllBlog = async (req, res, next) => {
 
 export const getBlogById = async (req, res, next) => {
   try {
-    const blog = await Blog.find(req.params.id);
+    const blog = await Blog.find({_id: req.params.id});
 
     if (!blog) return next(new ErrorHandler("blog not found", 404));
 
@@ -47,15 +47,15 @@ export const getBlogById = async (req, res, next) => {
 
 export const getBlogByUserId = async (req, res, next) => {
   try {
-    const  authorId  = req.params.key;
+    const  authorId  = req.params.id;
 
-    const blog = await Blog.find({ 'author.authorId': authorId })
+    const blogs = await Blog.find({ 'author.authorId': authorId })
 
-    if (!blog) return next(new ErrorHandler("blog not found", 404));
+    if (!blogs) return next(new ErrorHandler("blog not found", 404));
 
     res.status(200).json({
       success: true,
-      blog,
+      blogs,
     });
   } catch (error) {
     next(error);

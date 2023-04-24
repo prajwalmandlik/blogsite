@@ -103,9 +103,8 @@ const SetNewBlog = () => {
           })
           .then((res) => {
             const blog = res.data.blog;
-            setBlogData(blog);
-            console.log({...blog});
-            console.log(blogData);
+            setBlogData(...blog);
+            // console.log({...blog});
           })
           .catch((error) => {
             console.log(error);

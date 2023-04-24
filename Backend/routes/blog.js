@@ -13,7 +13,7 @@ router.get("/search/:key", getBlogBySearch);
 
 router.get("/filter/:key", getBlogByFilter);
 
-router.get("/getByUserId/:key", getBlogByUserId);
+router.get("/getByUserId/:id", getBlogByUserId);
 
 router
   .route("/:id")

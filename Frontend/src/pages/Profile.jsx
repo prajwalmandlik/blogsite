@@ -34,6 +34,7 @@ const Profile = () => {
       });
   }, []);
 
+
   if (!isAuthenticated) {
     return <Navigate to={`/`} />;
   }

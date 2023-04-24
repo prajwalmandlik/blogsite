@@ -34,4 +34,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   </React.StrictMode>
 );
 
-export const server = "http://localhost:4000/api/v1";
+// export const server = "http://localhost:4000/api/v1";
+export const server = "https://blogsite-backend-7j4k.onrender.com/api/v1";

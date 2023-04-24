@@ -11,9 +11,38 @@ import {
   VStack,
   HStack,
 } from "@chakra-ui/react";
+import axios from "axios";
+import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { server } from "../main";
 
 const BlogCard = ({ blogData, editor = false }) => {
+
+
+  const deleteScheme = () => {
+    const conf = confirm("delete blog");
+
+    if (!conf) {
+      return 0;
+    }
+    try {
+      axios
+        .delete(`${server}/blog/${blogData._id}`, {
+          withCredentials: true,
+        })
+        .then((res) => {
+          console.log(res);
+          toast.success("blog deleted");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+
   return (
     <SimpleGrid
       columns={[1, 1, 2]}
@@ -113,7 +142,7 @@ const BlogCard = ({ blogData, editor = false }) => {
                 <Button>Read More</Button>
               </Link>
               <Link to={`/writeBlog/${blogData._id}`}>
-              <Button ml={4}>Edit</Button></Link> <Button ml={4}>Delete</Button>
+              <Button ml={4}>Edit</Button></Link> <Button ml={4} onClick={deleteScheme}>Delete</Button>
             </HStack>
           </>
         ) : (
